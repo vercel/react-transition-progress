@@ -36,31 +36,47 @@ function useProgressBarContext() {
     return progress;
 }
 
+function random(min: number, max: number) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+/**
+ * This function calculates a difference (`diff`) based on the input number (`current`).
+ * 
+ * - If `current` is exactly 0, `diff` is set to 15.
+ * - If `current` is less than 50 (but not 0), `diff` is set to a random number between 1 and 10.
+ * - If `current` is 50 or more, `diff` is set to a random number between 1 and 5.
+ */
+function getDiff(
+    /** The current number used to calculate the difference. */
+    current: number): number {
+    let diff;
+    if (current === 0) {
+        diff = 15;
+    } else if (current < 50) {
+        diff = random(1, 10);
+    } else {
+        diff = random(1, 5);
+    }
+
+    return diff
+}
+
 const INITIAL = 'a' as const
 const IN_PROGRESS = 'b' as const
 const COMPLETING = 'c' as const
 const COMPLETE = 'd' as const
 
-function getDiff(current: number) {
-    let diff;
-    if (current === 0) {
-        diff = 15;
-    } else if (current < 50) {
-        diff = rand(1, 10);
-    } else {
-        diff = rand(1, 5);
-    }
-
-    return diff
-
-}
-
+/**
+ * Custom hook for managing progress state and animation.
+ * @returns An object containing the current state, spring animation, and functions to start and complete the progress.
+ */
 export function useProgressInternal() {
     const [state, setState] = useState<
         typeof INITIAL | typeof IN_PROGRESS | typeof COMPLETING | typeof COMPLETE
     >(INITIAL);
 
-    const value = useSpring(0, {
+    const spring = useSpring(0, {
         damping: 25,
         mass: 0.5,
         stiffness: 300,
@@ -70,45 +86,47 @@ export function useProgressInternal() {
     useInterval(
         () => {
             // If we start progress but the bar is currently complete, reset it first.
-            if (value.get() === 100) {
-                value.jump(0);
+            if (spring.get() === 100) {
+                spring.jump(0);
             }
 
-            const current = value.get();
-            value.set(Math.min(current + getDiff(current), 99));
+            const current = spring.get();
+            spring.set(Math.min(current + getDiff(current), 99));
         },
         state === IN_PROGRESS ? 750 : null
     );
 
     useEffect(() => {
         if (state === INITIAL) {
-            value.jump(0);
+            spring.jump(0);
         } else if (state === COMPLETING) {
-            value.set(100);
+            spring.set(100);
         }
 
-        return value.on("change", (latest) => {
+        return spring.on("change", (latest) => {
             if (latest === 100) {
                 setState(COMPLETE);
             }
         });
-    }, [value, state]);
+    }, [spring, state]);
 
+    /**
+     * Start the progress.
+     */
     function start() {
         setState(IN_PROGRESS);
     }
 
+    /**
+     * Complete the progress.
+     */
     function done() {
         setState((state) =>
             state === INITIAL || state === IN_PROGRESS ? COMPLETING : state
         );
     }
 
-    return { state, value, start, done };
-}
-
-function rand(min: number, max: number) {
-    return Math.floor(Math.random() * (max - min + 1)) + min;
+    return { state, spring, start, done };
 }
 
 function useInterval(callback: () => void, delay: number | null) {
@@ -140,10 +158,10 @@ export function ProgressBarProvider({ children }: { children: ReactNode }) {
 export function ProgressBar({
     className,
 }: {
-    className?: string;
+    className: string;
 }) {
     const progress = useProgressBarContext();
-    const width = useMotionTemplate`${progress.value}%`;
+    const width = useMotionTemplate`${progress.spring}%`;
 
     return (
         <LazyMotion features={domAnimation}>
@@ -158,16 +176,17 @@ export function ProgressBar({
     );
 }
 
-export function useProgress<T extends Function>(action: T) {
+type StartTransition = typeof startTransition
+export function useProgress(): StartTransition {
     const progress = useProgressBarContext();
-    function actionWithProgress(...args: any[]) {
+    const startTransitionWithProgress: StartTransition = (fn) => {
         progress.start();
 
         startTransition(() => {
             progress.done();
-            return action(...args)
+            return fn();
         });
     }
-    return actionWithProgress
+    return startTransitionWithProgress
 }
 

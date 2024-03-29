@@ -10,21 +10,21 @@ export function Link({
     ...rest
 }: Parameters<typeof NextLink>[0]) {
     const router = useRouter();
-    const routerPush = useProgress(router.push)
-    const routerReplace = useProgress(router.replace)
+    const startTransition = useProgress()
 
     return (
         <NextLink
             href={href}
             onClick={(e) => {
                 e.preventDefault();
-                const url = href.toString()
-                if (replace) {
-                    routerReplace(url)
-                } else {
-                    routerPush(url)
-                }
-
+                startTransition(() => {
+                    const url = href.toString()
+                    if (replace) {
+                        router.replace(url)
+                    } else {
+                        router.push(url)
+                    }
+                })
             }}
             {...rest}
         >
