@@ -12,6 +12,7 @@ import {
     startTransition,
     useContext,
     useEffect,
+    useOptimistic,
     useRef,
     useState,
 } from "react";
@@ -62,19 +63,12 @@ function getDiff(
     return diff
 }
 
-const INITIAL = 'a' as const
-const IN_PROGRESS = 'b' as const
-const COMPLETING = 'c' as const
-const COMPLETE = 'd' as const
-
 /**
  * Custom hook for managing progress state and animation.
  * @returns An object containing the current state, spring animation, and functions to start and complete the progress.
  */
 export function useProgressInternal() {
-    const [state, setState] = useState<
-        typeof INITIAL | typeof IN_PROGRESS | typeof COMPLETING | typeof COMPLETE
-    >(INITIAL);
+    const [loading, setLoading] = useOptimistic(false)
 
     const spring = useSpring(0, {
         damping: 25,
@@ -93,40 +87,23 @@ export function useProgressInternal() {
             const current = spring.get();
             spring.set(Math.min(current + getDiff(current), 99));
         },
-        state === IN_PROGRESS ? 750 : null
+        loading ? 750 : null
     );
 
     useEffect(() => {
-        if (state === INITIAL) {
+        if (!loading) {
             spring.jump(0);
-        } else if (state === COMPLETING) {
-            spring.set(100);
         }
-
-        return spring.on("change", (latest) => {
-            if (latest === 100) {
-                setState(COMPLETE);
-            }
-        });
-    }, [spring, state]);
+    }, [spring, loading]);
 
     /**
      * Start the progress.
      */
     function start() {
-        setState(IN_PROGRESS);
+        setLoading(true)
     }
 
-    /**
-     * Complete the progress.
-     */
-    function done() {
-        setState((state) =>
-            state === INITIAL || state === IN_PROGRESS ? COMPLETING : state
-        );
-    }
-
-    return { state, spring, start, done };
+    return { loading, spring, start };
 }
 
 function useInterval(callback: () => void, delay: number | null) {
@@ -165,7 +142,7 @@ export function ProgressBar({
 
     return (
         <LazyMotion features={domAnimation}>
-            {progress.state !== COMPLETE && (
+            {progress.loading && (
                 <m.div
                     style={{ width }}
                     exit={{ opacity: 0 }}
@@ -176,17 +153,13 @@ export function ProgressBar({
     );
 }
 
-type StartTransition = typeof startTransition
-export function useProgress(): StartTransition {
+type StartProgress = () => void
+export function useProgress(): StartProgress {
     const progress = useProgressBarContext();
-    const startTransitionWithProgress: StartTransition = (fn) => {
-        progress.start();
 
-        startTransition(() => {
-            progress.done();
-            return fn();
-        });
+    const startProgress: StartProgress = () => {
+        progress.start();
     }
-    return startTransitionWithProgress
+    return startProgress
 }
 

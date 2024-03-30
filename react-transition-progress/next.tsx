@@ -1,7 +1,9 @@
 "use client"
+import { startTransition } from "react";
+import NextLink from "next/link";
 import { useRouter } from "next/navigation";
 import { useProgress } from ".";
-import NextLink from "next/link";
+
 
 export function Link({
     href,
@@ -10,7 +12,7 @@ export function Link({
     ...rest
 }: Parameters<typeof NextLink>[0]) {
     const router = useRouter();
-    const startTransition = useProgress()
+    const startProgress = useProgress()
 
     return (
         <NextLink
@@ -18,6 +20,7 @@ export function Link({
             onClick={(e) => {
                 e.preventDefault();
                 startTransition(() => {
+                    startProgress()
                     const url = href.toString()
                     if (replace) {
                         router.replace(url)
