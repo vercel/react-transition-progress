@@ -1,36 +1,90 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# react-transition-progress
 
-## Getting Started
+Show a progress bar while a React transition is in progress.
 
-First, run the development server:
+## Installation
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install react-transition-progress
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+The main package `react-transition-progress` exports three APIs: `ProgressBarProvider`, `ProgressBar`, and `useProgress`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- `ProgressBarProvider` provides the state and context for `ProgressBar` and `useProgress`
+- `ProgressBar` is the displayed progressbar
+- `useProgress` is the way you start/finish the progressbar
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+There is also Next.js specific helper for `next/link` in `react-transition-progress/next`:
 
-## Learn More
+- `Link` is a wrapper for `next/link` that is instrumented to show the `ProgressBar`
 
-To learn more about Next.js, take a look at the following resources:
+For example integrating into the Next.js App Router:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```tsx
+// app/layout.tsx
+import { ProgressBar, ProgressBarProvider } from "@/react-transition-progress";
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+export default function RootLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
+  return (
+    <html lang="en">
+      <body>
+        <ProgressBarProvider>
+          {/* I.e. using Tailwind CSS to show the progress bar with custom styling */}
+          <ProgressBar className="fixed h-1 shadow-lg shadow-sky-500/20 bg-sky-500 top-0" />
+          {children}
+        </ProgressBarProvider>
+      </body>
+    </html>
+  );
+}
+```
 
-## Deploy on Vercel
+Using `useProgress` to show the `ProgressBar` when the [React transition](https://react.dev/reference/react/useTransition#starttransition) runs:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```tsx
+// components/my-component.tsx
+"use client";
+import { useState } from "react";
+import { useProgress } from "@/react-transition-progress";
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+export default function MyComponent() {
+  const startTransition = useProgress();
+  const [count, setCount] = useState(0);
+  return (
+    <>
+      <h1>Current count: {count}</h1>
+      <button
+        onClick={() => {
+          startTransition(async () => {
+            // Introduces artificial slowdown
+            await new Promise((resolve) => setTimeout(resolve, 2000));
+            setCount((count) => count + 1);
+          });
+        }}
+      >
+        Trigger transition
+      </button>
+    </>
+  );
+}
+```
+
+Using Next.js helper for `Link` to show the progress bar for `next/link`:
+
+```tsx
+// app/page.tsx
+import { Link } from "@/react-transition-progress/next";
+
+export default function Home() {
+  return (
+    <div>
+      <h1>Home</h1>
+      <Link href="/about">Go to about page</Link>
+    </div>
+  );
+}
+```

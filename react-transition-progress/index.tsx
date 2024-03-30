@@ -30,7 +30,7 @@ function useProgressBarContext() {
     const progress = useContext(ProgressBarContext);
 
     if (progress === null) {
-        throw new Error("Need to be inside provider");
+        throw new Error("Make sure to use `ProgressBarProvider` before using the progress bar.");
     }
 
     return progress;
