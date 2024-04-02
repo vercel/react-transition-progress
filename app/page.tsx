@@ -1,4 +1,4 @@
-import { Link } from "@/react-transition-progress/next";
+import { Link } from "@/react-transition-progress/src/next";
 
 export default function Home() {
   return (

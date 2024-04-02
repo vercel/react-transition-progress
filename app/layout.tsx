@@ -1,5 +1,5 @@
 import "./globals.css";
-import { ProgressBar, ProgressBarProvider } from "@/react-transition-progress";
+import { ProgressBar, ProgressBarProvider } from "@/react-transition-progress/src";
 
 export default function RootLayout({
   children,
