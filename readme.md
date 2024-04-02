@@ -48,7 +48,7 @@ Using `useProgress` to show the `ProgressBar` when the [React transition](https:
 ```tsx
 // components/my-component.tsx
 "use client";
-import { useState } from "react";
+import { useState, startTransition } from "react";
 import { useProgress } from "react-transition-progress";
 
 export default function MyComponent() {
