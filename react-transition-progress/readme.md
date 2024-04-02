@@ -22,7 +22,7 @@ For example integrating into the Next.js App Router:
 
 ```tsx
 // app/layout.tsx
-import { ProgressBar, ProgressBarProvider } from "@/react-transition-progress";
+import { ProgressBar, ProgressBarProvider } from "react-transition-progress";
 
 export default function RootLayout({
   children,
@@ -49,7 +49,7 @@ Using `useProgress` to show the `ProgressBar` when the [React transition](https:
 // components/my-component.tsx
 "use client";
 import { useState } from "react";
-import { useProgress } from "@/react-transition-progress";
+import { useProgress } from "react-transition-progress";
 
 export default function MyComponent() {
   const startProgress = useProgress();
@@ -78,7 +78,7 @@ Using Next.js helper for `Link` to show the progress bar for `next/link`:
 
 ```tsx
 // app/page.tsx
-import { Link } from "@/react-transition-progress/next";
+import { Link } from "react-transition-progress/next";
 
 export default function Home() {
   return (
