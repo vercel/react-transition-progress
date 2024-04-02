@@ -6,7 +6,7 @@ export default function Home() {
   return (
     <>
       <div className="m-10">
-        <h1 className="mb-2 text-4xl font-semibold">Home page</h1>
+        <h1 className="mb-4 text-4xl font-semibold"><a href="https://github.com/timneutkens/react-transition-progress">react-transition-progress</a></h1>
         <Link href="/slow">Go to artificially slow page</Link>
       </div>
       <div className="m-10">
