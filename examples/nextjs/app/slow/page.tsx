@@ -1,6 +1,8 @@
+import { unstable_noStore } from "next/cache";
 import { Link } from "react-transition-progress/next";
 
 export default async function SlowPage() {
+    unstable_noStore();
     // Introduces artificial slowdown
     await new Promise((resolve) => setTimeout(resolve, 2000));
     return (
