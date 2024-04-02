@@ -42,8 +42,10 @@
     }
   },
   "devDependencies": {
+    "@types/react": "^18.2.73",
     "bunchee": "^5.1.1",
     "framer-motion": "^11.0.24",
+    "next": "14.2.0-canary.52",
     "react": "19.0.0-canary-95e6f032c-20240401",
     "typescript": "^5.4.3"
   }
