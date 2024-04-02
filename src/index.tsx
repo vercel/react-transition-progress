@@ -106,6 +106,13 @@ export function useProgressInternal() {
     return { loading, spring, start };
 }
 
+
+/**
+ * Custom hook that sets up an interval to call the provided callback function.
+ *
+ * @param callback - The function to be called at each interval.
+ * @param delay - The delay (in milliseconds) between each interval. Pass `null` to stop the interval.
+ */
 function useInterval(callback: () => void, delay: number | null) {
     const savedCallback = useRef(callback);
 
@@ -127,11 +134,23 @@ function useInterval(callback: () => void, delay: number | null) {
     }, [delay]);
 }
 
+/**
+ * Provides the progress value to the child components.
+ *
+ * @param children - The child components to render.
+ * @returns The rendered ProgressBarContext.Provider component.
+ */
 export function ProgressBarProvider({ children }: { children: ReactNode }) {
     const progress = useProgressInternal()
     return <ProgressBarContext.Provider value={progress}>{children}</ProgressBarContext.Provider>;
 }
 
+/**
+ * Renders a progress bar component.
+ *
+ * @param className - The CSS class name for the progress bar.
+ * @returns The rendered progress bar component.
+ */
 export function ProgressBar({
     className,
 }: {
@@ -154,6 +173,11 @@ export function ProgressBar({
 }
 
 type StartProgress = () => void
+/**
+ * A custom hook that returns a function to start the progress. Call the start function in a transition to track it.
+ *
+ * @returns The function to start the progress. Call this function in a transition to track it.
+ */
 export function useProgress(): StartProgress {
     const progress = useProgressBarContext();
 
