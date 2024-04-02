@@ -24,6 +24,10 @@ export default function Home() {
           <MyComponent />
         </ProgressBarProvider>
       </div>
+
+      <div className="m-10">
+        <a href="https://github.com/timneutkens/react-transition-progress">react-transition-progress documentation</a>.
+      </div>
     </>
   );
 }
