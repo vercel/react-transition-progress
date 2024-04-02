@@ -1,8 +1,9 @@
 {
   "name": "react-transition-progress",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "scripts": {
-    "build": "bunchee"
+    "build": "bunchee",
+    "prepublish": "pnpm build"
   },
   "files": [
     "dist",
