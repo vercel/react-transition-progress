@@ -5,7 +5,9 @@ import NextLink from "next/link";
 import { useRouter } from "next/navigation";
 import { useProgress } from ".";
 
-
+/**
+ * A custom Link component that wraps Next.js's next/link component.
+ */
 export function Link({
     href,
     children,
