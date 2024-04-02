@@ -1,0 +1,49 @@
+{
+  "name": "react-transition-progress",
+  "version": "0.0.1",
+  "scripts": {
+    "build": "bunchee"
+  },
+  "files": [
+    "dist",
+    "readme.md"
+  ],
+  "exports": {
+    "./next": {
+      "import": {
+        "types": "./dist/es/next.d.mts",
+        "default": "./dist/es/next.mjs"
+      },
+      "require": {
+        "types": "./dist/cjs/next.d.ts",
+        "default": "./dist/cjs/next.js"
+      }
+    },
+    ".": {
+      "import": {
+        "types": "./dist/es/index.d.mts",
+        "default": "./dist/es/index.mjs"
+      },
+      "require": {
+        "types": "./dist/cjs/index.d.ts",
+        "default": "./dist/cjs/index.js"
+      }
+    }
+  },
+  "peerDependencies": {
+    "framer-motion": "*",
+    "next": "*",
+    "react": "*"
+  },
+  "peerDependenciesMeta": {
+    "next": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "bunchee": "^5.1.1",
+    "framer-motion": "^11.0.24",
+    "react": "19.0.0-canary-95e6f032c-20240401",
+    "typescript": "^5.4.3"
+  }
+}

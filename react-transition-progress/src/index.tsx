@@ -9,12 +9,11 @@ import {
 import {
     ReactNode,
     createContext,
-    startTransition,
     useContext,
     useEffect,
+    // @ts-ignore This export exists on react@canary
     useOptimistic,
     useRef,
-    useState,
 } from "react";
 
 /**
