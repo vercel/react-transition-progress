@@ -2,6 +2,8 @@
 
 Show a progress bar while a React transition is in progress.
 
+[Visit the demo](https://react-transition-progress.vercel.app/).
+
 ## Installation
 
 ```bash
