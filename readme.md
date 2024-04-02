@@ -5,7 +5,7 @@ Show a progress bar while a React transition is in progress.
 ## Installation
 
 ```bash
-npm install react-transition-progress
+npm install react-transition-progress framer-motion
 ```
 
 The main package `react-transition-progress` exports three APIs: `ProgressBarProvider`, `ProgressBar`, and `useProgress`.
@@ -89,3 +89,7 @@ export default function Home() {
   );
 }
 ```
+
+## Contributing
+
+See the [Contributing Guide](./contributing.md).
