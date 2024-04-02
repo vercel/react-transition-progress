@@ -95,3 +95,13 @@ export default function Home() {
 ## Contributing
 
 See the [Contributing Guide](./contributing.md).
+
+## Authors
+
+- Tim Neutkens ([@timneutkens](https://twitter.com/timneutkens))
+- Sam Selikoff ([@samselikoff](https://twitter.com/samselikoff))
+- Ryan Toronto ([@ryantotweets](https://twitter.com/ryantotweets))
+
+### History
+
+This package is an improved version of [the demo](https://buildui.com/posts/global-progress-in-nextjs) shown in Sam & Ryan's [article on Build UI](https://buildui.com/posts/global-progress-in-nextjs). It leverages [React's `useOptimistic`](https://react.dev/reference/react/useOptimistic) to track [React Transitions](https://react.dev/reference/react/useTransition).
