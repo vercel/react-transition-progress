@@ -76,6 +76,31 @@ export default function MyComponent() {
 }
 ```
 
+You can also create nested progress bars by adding `ProgressBarProvider` and `ProgressBar` deeper in the React tree:
+
+```tsx
+import MyComponent from "@/components/my-component";
+import { ProgressBar, ProgressBarProvider } from "react-transition-progress";
+import { Link } from "react-transition-progress/next";
+
+export default function Home() {
+  return (
+    <>
+      <div className="m-10">
+        <ProgressBarProvider>
+          <h2 className="mb-2 pb-1 text-2xl font-semibold relative">
+            My Title
+            {/* I.e. using Tailwind CSS to show the progress bar with custom styling */}
+            <ProgressBar className="absolute h-1 shadow-lg shadow-sky-500/20 bg-sky-500 bottom-0" />
+          </h2>
+          <MyComponent />
+        </ProgressBarProvider>
+      </div>
+    </>
+  );
+}
+```
+
 Using Next.js helper for `Link` to show the progress bar for `next/link`:
 
 ```tsx
