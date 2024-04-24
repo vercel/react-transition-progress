@@ -21,6 +21,7 @@ export function Link({
         <NextLink
             href={href}
             onClick={(e) => {
+                if (e.metaKey || e.ctrlKey) return;
                 e.preventDefault();
                 startTransition(() => {
                     startProgress()
