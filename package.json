@@ -42,7 +42,7 @@
     }
   },
   "devDependencies": {
-    "@types/react": "^18.2.73",
+    "@types/react": "^18.2.79",
     "bunchee": "^5.1.1",
     "framer-motion": "^11.0.24",
     "next": "14.2.0-canary.52",
