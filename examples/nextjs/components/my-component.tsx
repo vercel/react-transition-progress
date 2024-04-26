@@ -1,9 +1,8 @@
 "use client";
-import { useState, useTransition } from "react";
+import { startTransition, useState } from "react";
 import { useProgress } from "react-transition-progress";
 
 export default function MyComponent() {
-    const [_isPending, startTransition] = useTransition();
     const startProgress = useProgress();
     const [count, setCount] = useState(0);
     return (
