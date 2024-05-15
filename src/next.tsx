@@ -4,6 +4,8 @@ import { startTransition } from "react";
 import NextLink from "next/link";
 import { useRouter } from "next/navigation";
 import { useProgress } from ".";
+import { format,  } from "url";
+
 
 // Copied from  https://github.com/vercel/next.js/blob/canary/packages/next/src/client/link.tsx#L180-L191
 function isModifiedEvent(event: React.MouseEvent): boolean {
@@ -26,6 +28,7 @@ export function Link({
     href,
     children,
     replace,
+    scroll,
     ...rest
 }: Parameters<typeof NextLink>[0]) {
     const router = useRouter();
@@ -39,11 +42,11 @@ export function Link({
                 e.preventDefault();
                 startTransition(() => {
                     startProgress()
-                    const url = href.toString()
+                    const url = typeof href === 'string' ? href : format(href)
                     if (replace) {
-                        router.replace(url)
+                        router.replace(url, { scroll })
                     } else {
-                        router.push(url)
+                        router.push(url, { scroll })
                     }
                 })
             }}
