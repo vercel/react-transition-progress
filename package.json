@@ -34,8 +34,7 @@
   "peerDependencies": {
     "framer-motion": "*",
     "next": "*",
-    "react": "*",
-    "url": "*"
+    "react": "*"
   },
   "peerDependenciesMeta": {
     "next": {
@@ -48,7 +47,6 @@
     "framer-motion": "^11.0.24",
     "next": "14.2.0-canary.52",
     "react": "19.0.0-canary-95e6f032c-20240401",
-    "typescript": "^5.4.3",
-    "url": "^0.11.3"
+    "typescript": "^5.4.3"
   }
 }

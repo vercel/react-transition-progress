@@ -4,7 +4,7 @@ import { startTransition } from "react";
 import NextLink from "next/link";
 import { useRouter } from "next/navigation";
 import { useProgress } from ".";
-import { format,  } from "url";
+import { formatUrl } from './format-url';
 
 
 // Copied from  https://github.com/vercel/next.js/blob/canary/packages/next/src/client/link.tsx#L180-L191
@@ -42,7 +42,7 @@ export function Link({
                 e.preventDefault();
                 startTransition(() => {
                     startProgress()
-                    const url = typeof href === 'string' ? href : format(href)
+                    const url = typeof href === 'string' ? href : formatUrl(href)
                     if (replace) {
                         router.replace(url, { scroll })
                     } else {
