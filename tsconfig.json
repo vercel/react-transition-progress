@@ -2,6 +2,7 @@
   "compilerOptions": {
     "module": "ES2022",
     "moduleResolution": "bundler",
+    "lib": ["ES2017", "DOM"],
     "jsx": "react-jsx"
   }
 }
