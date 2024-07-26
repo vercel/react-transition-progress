@@ -24,18 +24,19 @@ function isModifiedEvent(event: React.MouseEvent): boolean {
 /**
  * A custom Link component that wraps Next.js's next/link component.
  */
-export function Link({
+export const Link = React.forwardRef<HTMLAnchorElement, Parameters<typeof NextLink>[0]>(function Link({
     href,
     children,
     replace,
     scroll,
     ...rest
-}: Parameters<typeof NextLink>[0]) {
+}, ref) {
     const router = useRouter();
     const startProgress = useProgress()
 
     return (
         <NextLink
+            ref={ref}
             href={href}
             onClick={(e) => {
                 if (isModifiedEvent(e)) return;
@@ -55,4 +56,4 @@ export function Link({
             {children}
         </NextLink>
     );
-}
+})
