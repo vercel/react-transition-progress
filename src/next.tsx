@@ -29,6 +29,7 @@ export function Link({
     children,
     replace,
     scroll,
+    onClick,
     ...rest
 }: Parameters<typeof NextLink>[0]) {
     const router = useRouter();
@@ -38,6 +39,7 @@ export function Link({
         <NextLink
             href={href}
             onClick={(e) => {
+                onClick?.(e);
                 if (isModifiedEvent(e)) return;
                 e.preventDefault();
                 startTransition(() => {
