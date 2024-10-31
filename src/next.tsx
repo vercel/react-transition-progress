@@ -29,6 +29,7 @@ export const Link = React.forwardRef<HTMLAnchorElement, Parameters<typeof NextLi
     children,
     replace,
     scroll,
+    onClick,
     ...rest
 }, ref) {
     const router = useRouter();
@@ -39,6 +40,7 @@ export const Link = React.forwardRef<HTMLAnchorElement, Parameters<typeof NextLi
             ref={ref}
             href={href}
             onClick={(e) => {
+                onClick?.(e);
                 if (isModifiedEvent(e)) return;
                 e.preventDefault();
                 startTransition(() => {
