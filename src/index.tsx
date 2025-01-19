@@ -49,18 +49,19 @@ function random(min: number, max: number) {
  * - If `current` is 50 or more, `diff` is set to a random number between 1 and 5.
  */
 function getDiff(
-    /** The current number used to calculate the difference. */
-    current: number): number {
-    let diff;
-    if (current === 0) {
-        diff = 15;
-    } else if (current < 50) {
-        diff = random(1, 10);
-    } else {
-        diff = random(1, 5);
-    }
+  /** The current number used to calculate the difference. */
+  current: number
+): number {
+  let diff;
+  if (current === 0) {
+    diff = 0.15;
+  } else if (current < 0.5) {
+    diff = random(1, 10) / 100;
+  } else {
+    diff = random(1, 5) / 100;
+  }
 
-    return diff
+  return diff;
 }
 
 /**
@@ -68,44 +69,43 @@ function getDiff(
  * @returns An object containing the current state, spring animation, and functions to start and complete the progress.
  */
 export function useProgressInternal() {
-    const [loading, setLoading] = useOptimistic(false)
+  const [loading, setLoading] = useOptimistic(false);
 
-    const spring = useSpring(0, {
-        damping: 25,
-        mass: 0.5,
-        stiffness: 300,
-        restDelta: 0.1,
-    });
+  const spring = useSpring(0, {
+    damping: 25,
+    mass: 0.5,
+    stiffness: 300,
+    restDelta: 0.1,
+  });
 
-    useInterval(
-        () => {
-            // If we start progress but the bar is currently complete, reset it first.
-            if (spring.get() === 100) {
-                spring.jump(0);
-            }
+  useInterval(
+    () => {
+      // If we start progress but the bar is currently complete, reset it first.
+      if (spring.get() === 1) {
+        spring.jump(0);
+      }
 
-            const current = spring.get();
-            spring.set(Math.min(current + getDiff(current), 99));
-        },
-        loading ? 750 : null
-    );
+      const current = spring.get();
+      spring.set(Math.min(current + getDiff(current), 0.99));
+    },
+    loading ? 750 : null
+  );
 
-    useEffect(() => {
-        if (!loading) {
-            spring.jump(0);
-        }
-    }, [spring, loading]);
-
-    /**
-     * Start the progress.
-     */
-    function start() {
-        setLoading(true)
+  useEffect(() => {
+    if (!loading) {
+      spring.jump(0);
     }
+  }, [spring, loading]);
 
-    return { loading, spring, start };
+  /**
+   * Start the progress.
+   */
+  function start() {
+    setLoading(true);
+  }
+
+  return { loading, spring, start };
 }
-
 
 /**
  * Custom hook that sets up an interval to call the provided callback function.
@@ -114,24 +114,24 @@ export function useProgressInternal() {
  * @param delay - The delay (in milliseconds) between each interval. Pass `null` to stop the interval.
  */
 function useInterval(callback: () => void, delay: number | null) {
-    const savedCallback = useRef(callback);
+  const savedCallback = useRef(callback);
 
-    useEffect(() => {
-        savedCallback.current = callback;
-    }, [callback]);
+  useEffect(() => {
+    savedCallback.current = callback;
+  }, [callback]);
 
-    useEffect(() => {
-        function tick() {
-            savedCallback.current();
-        }
+  useEffect(() => {
+    function tick() {
+      savedCallback.current();
+    }
 
-        if (delay !== null) {
-            tick();
+    if (delay !== null) {
+      tick();
 
-            let id = setInterval(tick, delay);
-            return () => clearInterval(id);
-        }
-    }, [delay]);
+      let id = setInterval(tick, delay);
+      return () => clearInterval(id);
+    }
+  }, [delay]);
 }
 
 /**
@@ -141,8 +141,12 @@ function useInterval(callback: () => void, delay: number | null) {
  * @returns The rendered ProgressBarContext.Provider component.
  */
 export function ProgressBarProvider({ children }: { children: ReactNode }) {
-    const progress = useProgressInternal()
-    return <ProgressBarContext.Provider value={progress}>{children}</ProgressBarContext.Provider>;
+  const progress = useProgressInternal();
+  return (
+    <ProgressBarContext.Provider value={progress}>
+      {children}
+    </ProgressBarContext.Provider>
+  );
 }
 
 /**
@@ -151,26 +155,28 @@ export function ProgressBarProvider({ children }: { children: ReactNode }) {
  * @param className - The CSS class name for the progress bar.
  * @returns The rendered progress bar component.
  */
-export function ProgressBar({
-    className,
-}: {
-    className: string;
-}) {
-    const progress = useProgressBarContext();
-    const width = useMotionTemplate`${progress.spring}%`;
+export function ProgressBar({ className }: { className: string }) {
+  const progress = useProgressBarContext();
+  const transform = useMotionTemplate`scaleX(${progress.spring})`;
 
-    return (
-        <LazyMotion features={domAnimation}>
-            {progress.loading && (
-                <m.div
-                    style={{ width }}
-                    exit={{ opacity: 0 }}
-                    className={className}
-                />
-            )}
-        </LazyMotion>
-    );
+  return (
+    <LazyMotion features={domAnimation}>
+      {progress.loading && (
+        <m.div
+          style={{
+            width: "100%",
+            transformOrigin: "left",
+            transition: "transform 100ms",
+            transform,
+          }}
+          exit={{ opacity: 0 }}
+          className={className}
+        />
+      )}
+    </LazyMotion>
+  );
 }
+  
 
 type StartProgress = () => void
 /**
