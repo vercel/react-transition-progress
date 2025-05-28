@@ -43,10 +43,14 @@
   },
   "devDependencies": {
     "@types/react": "^18.2.79",
-    "bunchee": "^5.1.1",
-    "framer-motion": "^11.0.24",
+    "bunchee": "^5.6.2",
+    "framer-motion": "^11.18.2",
     "next": "14.2.0-canary.52",
     "react": "19.0.0-canary-95e6f032c-20240401",
-    "typescript": "^5.4.3"
+    "typescript": "^5.8.3"
+  },
+  "packageManager": "pnpm@10.11.0+sha1.4048eeefd564ff1ab248fac3e2854d38245fe2f1",
+  "dependencies": {
+    "react-transition-progress": "^0.0.4"
   }
 }
