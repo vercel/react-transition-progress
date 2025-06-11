@@ -1,11 +1,12 @@
 "use client";
-import React from 'react'
+
 import {
     useMotionTemplate,
     useSpring,
     m,
     LazyMotion,
     domAnimation,
+    AnimatePresence,
 } from "framer-motion";
 import {
     ReactNode,
@@ -79,11 +80,6 @@ export function useProgressInternal() {
 
     useInterval(
         () => {
-            // If we start progress but the bar is currently complete, reset it first.
-            if (spring.get() === 100) {
-                spring.jump(0);
-            }
-
             const current = spring.get();
             spring.set(Math.min(current + getDiff(current), 99));
         },
@@ -91,8 +87,12 @@ export function useProgressInternal() {
     );
 
     useEffect(() => {
-        if (!loading) {
-            spring.jump(0);
+        if (loading) {
+            // Simluate first "tick", to avoid having to wait 750 ms for feedback
+            spring.set(getDiff(0));
+        } else {
+            // Jump to 100 when complete
+            spring.jump(100);
         }
     }, [spring, loading]);
 
@@ -100,7 +100,9 @@ export function useProgressInternal() {
      * Start the progress.
      */
     function start() {
-        setLoading(true)
+        // Reset when starting
+        spring.jump(0);
+        setLoading(true);
     }
 
     return { loading, spring, start };
@@ -161,13 +163,15 @@ export function ProgressBar({
 
     return (
         <LazyMotion features={domAnimation}>
-            {progress.loading && (
-                <m.div
-                    style={{ width }}
-                    exit={{ opacity: 0 }}
-                    className={className}
-                />
-            )}
+            <AnimatePresence>
+                {progress.loading && (
+                    <m.div
+                        style={{ width }}
+                        exit={{ opacity: 0 }}
+                        className={className}
+                    />
+                )}
+            </AnimatePresence>
         </LazyMotion>
     );
 }
@@ -186,4 +190,3 @@ export function useProgress(): StartProgress {
     }
     return startProgress
 }
-
