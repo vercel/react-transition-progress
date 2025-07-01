@@ -15,6 +15,7 @@ import {
     // @ts-ignore This export exists on react@canary
     useOptimistic,
     useRef,
+    startTransition,
 } from "react";
 
 /**
@@ -65,10 +66,13 @@ function getDiff(
 
 /**
  * Custom hook for managing progress state and animation.
+ * @param startDelay - The delay (in milliseconds) before the progress bar animation starts. Defaults to 0ms.
  * @returns An object containing the current state, spring animation, and functions to start and complete the progress.
  */
-export function useProgressInternal() {
-    const [loading, setLoading] = useOptimistic(false)
+export function useProgressInternal(startDelay: number = 0) {
+    const [loading, setLoading] = useOptimistic(false);
+    const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+    const isCompletedRef = useRef(false);
 
     const spring = useSpring(0, {
         damping: 25,
@@ -100,10 +104,48 @@ export function useProgressInternal() {
      * Start the progress.
      */
     function start() {
-        setLoading(true)
+        // Clear any existing timeout and reset completion state
+        if (timeoutRef.current) {
+            clearTimeout(timeoutRef.current);
+            timeoutRef.current = null;
+        }
+        isCompletedRef.current = false;
+
+        if (startDelay > 0) {
+            timeoutRef.current = setTimeout(() => {
+                // Only start if we haven't been completed in the meantime
+                if (!isCompletedRef.current) {
+                    startTransition(() => {
+                        setLoading(true);
+                    });
+                    spring.jump(0);
+                }
+                timeoutRef.current = null;
+            }, startDelay);
+        } else {
+            startTransition(() => {
+                setLoading(true);
+            });
+            spring.jump(0);
+        }
     }
 
-    return { loading, spring, start };
+    /**
+     * Complete the progress and clear any pending start timeout.
+     */
+    function complete() {
+        // Clear pending timeout to prevent delayed start
+        if (timeoutRef.current) {
+            clearTimeout(timeoutRef.current);
+            timeoutRef.current = null;
+        }
+        isCompletedRef.current = true;
+        startTransition(() => {
+            setLoading(false);
+        });
+    }
+
+    return { loading, spring, start, complete };
 }
 
 
@@ -138,10 +180,17 @@ function useInterval(callback: () => void, delay: number | null) {
  * Provides the progress value to the child components.
  *
  * @param children - The child components to render.
+ * @param startDelay - The delay (in milliseconds) before the progress bar animation starts. Defaults to 0ms.
  * @returns The rendered ProgressBarContext.Provider component.
  */
-export function ProgressBarProvider({ children }: { children: ReactNode }) {
-    const progress = useProgressInternal()
+export function ProgressBarProvider({ 
+    children, 
+    startDelay = 0 
+}: { 
+    children: ReactNode;
+    startDelay?: number;
+}) {
+    const progress = useProgressInternal(startDelay);
     return <ProgressBarContext.Provider value={progress}>{children}</ProgressBarContext.Provider>;
 }
 
@@ -172,18 +221,26 @@ export function ProgressBar({
     );
 }
 
-type StartProgress = () => void
+type ProgressControls = {
+    start: () => void;
+    complete: () => void;
+};
+
 /**
- * A custom hook that returns a function to start the progress. Call the start function in a transition to track it.
+ * A custom hook that returns functions to control the progress. Call the start function in a transition to track it, and call complete when the operation finishes.
  *
- * @returns The function to start the progress. Call this function in a transition to track it.
+ * @returns An object with start and complete functions to control the progress.
  */
-export function useProgress(): StartProgress {
+export function useProgress(): ProgressControls {
     const progress = useProgressBarContext();
 
-    const startProgress: StartProgress = () => {
+    const startProgress = () => {
         progress.start();
-    }
-    return startProgress
-}
+    };
 
+    const completeProgress = () => {
+        progress.complete();
+    };
+
+    return { start: startProgress, complete: completeProgress };
+}
